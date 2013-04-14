@@ -4,17 +4,8 @@
 		
 		<link rel="stylesheet" href="css/style.css" />
 		<link rel="stylesheet" href="css/jquery-ui.css" />
-		<script src="js/kinetic-v4.4.0.min.js"></script>
-		<script src="js/jquery-1.9.1.js"></script>
 		<link charset="utf-8" href="css/jquery.colourPicker.css" media="screen" rel="stylesheet" type="text/css">
-		<script src="js/jquery.colourPicker.js" type="text/javascript"></script>
-		<script src="js/jquery-ui.js" type="text/javascript"></script>
-		<script src="js/a.js" type="text/javascript"></script>
-		<script src="js/rcolor.js" type="text/javascript"></script>
-		<script src="js/app.js"></script>
-		<script src="js/data.js"></script>
 	</head>
-  
 	<body>	
 		<div id='cssmenu'>
 			<ul>
@@ -24,7 +15,7 @@
 					 <li><a id="choose_file"><span>Open File</span></a></li>
 				  </ul>
 			   </li>
-			   <li class='point has-sub '><a><span>Save Diagram</span></a>
+			   <li class='point has-sub '><a><span>Save</span></a>
 				  <ul>
 					 <li><a id="save_file"><span>As File</span></a></li>
 					 <li class='has-sub '><a><span>As Image</span></a>
@@ -35,19 +26,23 @@
 					 </li>
 				  </ul>
 			   </li>
-			   <li class='point has-sub '><a><span>Add To Diagram</span></a>
+			   <li class='point has-sub '><a><span>Add</span></a>
 				  <ul>
 					 <li id='moreblocks'><a><span>Block</span></a></li>
 					 <li id='moreperiphs'><a><span>Peripheral</span></a></li>
 				  </ul>
 			   </li>
+			   
 			</ul>
 		</div>
-		<div id="border">
-			<div id="container"></div>
-		</div>
+		<div id="container"></div>
 		<div id="Drag_Canvas">
 			<a class="floatbutton">Click to Drag Canvas</a>
+		</div>
+		<div id="window_actions">
+			<a  class='box ' id='maxwindow'  title="Maximize"><img src='../images/maximize.svg'/></a>
+			<a  class='box ' id='reswindow' style="display: none;"  title="Restore"><img src='../images/restore.svg'/></a>
+			<a  class='box ' id='closewindow'  title="Close"><img src='../images/close.svg'/></a>
 		</div>
 		<div id="dialog-form" title="Edit">
 			<input type="hidden" id="name" value=""/></br>
@@ -58,11 +53,21 @@
 			Part: <input type="text" id="part" value=""/></br>
 			Width: <select id="width"><option value="100" selected>100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select>
 			Height: <select id="height"><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400" selected>400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></br>
-			Intf: <select id="line"><option  value=""/></option><option  value="SPI"/>SPI</option><option  value="I2C"/>I2C</option><option  value="PCIe"/>PCIe</option><option  value="extBus"/>extBus</option><option  value="DDRbus"/>DDRbus</option><option  value="LCDbus"/>LCDbus</option></select>
-			Length: <select id="length"><option value="100" selected>100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option></select>
-			Orient: <select id="orient"><option value="0">Up</option><option value="1" selected>Right</option><option value="2">Down</option><option value="3">Left</option></select></br>
+			<div id='extra'>
+				Intf: <select id="line"><option  value=""/></option><option  value="SPI"/>SPI</option><option  value="I2C"/>I2C</option><option  value="PCIe"/>PCIe</option><option  value="extBus"/>extBus</option><option  value="DDRbus"/>DDRbus</option><option  value="LCDbus"/>LCDbus</option></select>
+				Length: <select id="length"><option value="100" selected>100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option></select>
+				Orient: <select id="orient"><option value="0">Up</option><option value="1" selected>Right</option><option value="2">Down</option><option value="3">Left</option></select></br>
+			</div>
 		</div>
 	</body>
+	<script src="js/kinetic-v4.4.0.min.js"></script>
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery.colourPicker.js" type="text/javascript"></script>
+	<script src="js/jquery-ui.js" type="text/javascript"></script>
+	<script src="js/a.js" type="text/javascript"></script>
+	<script src="js/rcolor.js" type="text/javascript"></script>
+	<script src="js/app.js"></script>
+	<script src="js/data.js"></script>
 </html>
 
 
