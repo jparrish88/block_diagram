@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // onClick's logic below:
     link.addEventListener('click', function() {
         moreboxes(0);
+		//getpdf();
     });
 });
 document.addEventListener('DOMContentLoaded', function() {
@@ -48,6 +49,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('savejpg');
+    // onClick's logic below:
+    link.addEventListener('click', function() {
+        var blobit = getAsJPEGBlob(shapesLayer);
+		saveFileJPG(blobit);
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('saveimage');
     // onClick's logic below:
     link.addEventListener('click', function() {
@@ -58,14 +67,48 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('cssmenu');
+    // onClick's logic below:
+    link.addEventListener('mousedown',function(evt){
+		// Record where the window started
+		
+		var winX = window.top.screenX,
+			winY = window.top.screenY;
+
+		// Record where the mouse started
+		var mX = evt.clientX,
+			mY = evt.clientY;
+
+		// When moving anywhere on the page, drag the window
+		// …until the mouse button comes up
+		document.body.addEventListener('mousemove',drag,false);
+		document.body.addEventListener('mouseup',function(){
+		  document.body.removeEventListener('mousemove',drag,false);
+		},false);
+
+		// Every time the mouse moves, we do the following 
+		function drag(evt){
+		  // Add difference between where the mouse is now
+		  // versus where it was last to the original positions
+		  X2 = winX + evt.clientX-mX;
+		  Y2 = winY + evt.clientY-mY;
+		  window.moveTo(X2,Y2);
+		};
+	},false);
+});
+
 $(window).resize(function() {
 	stage.setSize($(window).width()-2, $(window).height()-56);
 });
 
 var shapesLayer;
 var jsontxt;
+var jsonrect;
 var stage;
 var divClone;
+var pdfdata;
 
 window.onload = function() 
 {		
@@ -332,6 +375,23 @@ function paintb(layer,block,stat)
 	}
 	layer.draw();
 };
+
+
+function highlightbox()
+{
+	
+	block.setAttrs(
+	{
+		shadowColor: 'black',
+		shadowBlur: 10,
+		shadowOffset: 10,
+		shadowOpacity: 0.6
+	});
+
+	layer.draw();
+};
+
+
 function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 {  
 
@@ -340,28 +400,26 @@ function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 	
 	
 	var group = new Kinetic.Group({
-	  x: 0,
-	  y: 0,
+	  x: 50,
+	  y: 50,
 	  draggable:1,
 	  id:name,
+	  offset: [width/2, height/2],
 	});
 	var box = new Kinetic.Rect({
-	  x: x,
-	  y: y,
-	  stroke: 'black',
-	  strokeWidth: 1,
-	  width: width,
-	  height: height,
-	  cornerRadius: 10,
-	  
-	  shadow: {
-		color: 'black',
-		blur: 10,
-		offset: [5, 5],
-		opacity: 0.6
-	  },
-	  fill:color,
-	  name:'box',
+		x: x,
+		y: y,
+		stroke: 'black',
+		strokeWidth: 1,
+		width: width,
+		height: height,
+		cornerRadius: 10,
+		fill:color,
+		shadowColor: 'black',
+		shadowBlur: 10,
+		shadowOffset: 8,
+		shadowOpacity: 0.5,
+		name:'box',
 	});
 	
 	var typetext = new Kinetic.Text({
@@ -435,34 +493,60 @@ function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 		});
 		
 		var line = new Kinetic.Line({
-		  points: [x1, y1, x2, y2],
-		  stroke: "black",
-		  strokeWidth: 2,  
-		  name:'orient',
-		  shadow: {
-			color: 'black',
-			blur: 10,
-			offset: [1, 1],
-			opacity: 0.1
-		  },
+			points: [x1, y1, x2, y2],
+			stroke: "black",
+			strokeWidth: 2,  
+			name:'orient',
+			shadowColor: 'black',
+			shadowBlur: 10,
+			shadowOffset: 1,
+			shadowOpacity: 0.5,
 		});
 		
 		group.add(line);
 		group.add(linetext);
 	}
 	
+	
+	
+	
 	group.on("mouseover touchstart", function() {
-	  document.body.style.cursor = "pointer";
-	  paintb(shapesLayer,box,1);
+		document.body.style.cursor = "pointer";
+		this.setOpacity(.3);
+		box.setAttrs(
+		{
+			shadowOffset: 0,
+		});
+		shapesLayer.draw();
 	});
 	group.on("mouseout touchend", function() {
-	  document.body.style.cursor = "default";
-	  paintb(shapesLayer,box,0);
+		document.body.style.cursor = "default";
+		
+		box.attrs.shadowOpacity=0.6;
+		this.setOpacity(1);
+		box.setAttrs(
+		{
+			shadowOffset: 8,
+		});
+		shapesLayer.draw();
 	});
 	group.on("dblclick", function() {
 		beforemodalopen(name);
 	});
-	
+	group.on("highlight", function() {
+		setTimeout(function() {
+			group.transitionTo(
+			{
+			  rotation: Math.PI * 2,
+			  duration: 1,
+			  easing: 'elastic-ease-out',
+			  callback: function() 
+			  {
+				//if needed
+			  }
+			});
+      }, 0)
+	});
 	group.add(box);
 	group.add(typetext);
 	group.add(subtypetext);
@@ -470,6 +554,8 @@ function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 	group.add(parttext);
 	shapesLayer.add(group);
 	shapesLayer.draw();
+	group.fire('highlight');
+	
 };		
 
 function update(box,str0,str1,str2,str3,str4,length,dir,color,width,height,lined)
@@ -689,4 +775,55 @@ function gwsc()
 		}
 	}
 	return coloropt;
+}
+
+function getpdf(imgdata)
+{
+	var doc = new jsPDF();
+	doc.setFontSize(40);
+	doc.addImage(imgData, 'JPEG', 15, 40, 180, 180);
+	pdfdata = doc.output('datauristring');
+	window.open(pdfdata);
+
+};
+
+
+function dataURItoBlob(dataURI, callback) {
+	// convert base64 to raw binary data held in a string
+	// doesn't handle URLEncoded DataURIs
+
+	var byteString;
+	if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+		byteString = atob(dataURI.split(',')[1]);
+	} else {
+		byteString = unescape(dataURI.split(',')[1]);
+	}
+
+	// separate out the mime component
+	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+	// write the bytes of the string to an ArrayBuffer
+	var ab = new ArrayBuffer(byteString.length);
+	var ia = new Uint8Array(ab);
+	for (var i = 0; i < byteString.length; i++) {
+		ia[i] = byteString.charCodeAt(i);
+	}
+
+	// write the ArrayBuffer to a blob, and you're done
+	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder ||
+                     window.MozBlobBuilder || window.MSBlobBuilder;
+	var bb = new BlobBuilder();
+	bb.append(ab);
+	return bb.getBlob(mimeString);
+}
+
+function getAsJPEGBlob(canvas) {
+	if(canvas.mozGetAsFile) {
+		return canvas.mozGetAsFile("foo.jpg", "image/jpeg");
+	} else {
+		var data = canvas.toDataURL("image/jpeg");
+		var blob = dataURItoBlob(data);
+		return blob;
+		//return data;
+	}
 }

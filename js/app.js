@@ -203,4 +203,21 @@ function saveFileButton()
   });
 };
 
+document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('save_file');
+    // onClick's logic below:
+    link.addEventListener('click', function() {
+        saveFileJPG();
+    });
+});
+function saveFileJPG(jpgdata)
+{
+  var config = {type: 'saveFile', suggestedName: 'blockdiagram.ong'};
+  chrome.fileSystem.chooseEntry(config, function(entry) {
+    var blob = new Blob([jpgdata], {type: 'image/png'});
+    writeFileEntry(entry, blob, function(e) {
+      console.log('Write completed.');
+    });
+  });
+};
 
