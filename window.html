@@ -23,6 +23,10 @@
 						   <li><a id="saveimage"><span>PNG</span></a></li>
 						   <li  class="disabled "><a id="savejpg"><span>JPG</span></a></li>
 						</ul>
+						
+					  <li  class="disabled " style="display:none"><a id="savepdf"><span>As PDF</span></a></li>
+					  <li  class="disabled " style="display:none"><a id="savepaper"><span>As Paper</span></a></li>
+						
 					 </li>
 				  </ul>
 			   </li>
@@ -40,6 +44,7 @@
 			<a class="floatbutton">Click to Drag Canvas</a>
 		</div>
 		<div id="window_actions">
+			<a  class='box ' id='minwindow'  title="Minimize"><img src='../images/minimize.svg'/></a>
 			<a  class='box ' id='maxwindow'  title="Maximize"><img src='../images/maximize.svg'/></a>
 			<a  class='box ' id='reswindow' style="display: none;"  title="Restore"><img src='../images/restore.svg'/></a>
 			<a  class='box ' id='closewindow'  title="Close"><img src='../images/close.svg'/></a>
@@ -47,17 +52,30 @@
 		<div id="dialog-form" title="Edit">
 			<input type="hidden" id="name" value=""/></br>
 			Color: <select id="color" value=""/></select></br>
-			Type: <input type="text" id="type" value=""/></br>
-			Subtype: <input type="text" id="subtype" value=""/></br>
+			Type: <input id="type" list="TypeList"/></br>
+			Subtype: <input type="text" id="subtype" list="SubTypeList" value=""/></br>
 			Manufacturer: <input type="text" id="manu" value=""/></br>
 			Part: <input type="text" id="part" value=""/></br>
-			Width: <select id="width"><option value="100" selected>100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select>
-			Height: <select id="height"><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400" selected>400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option></select></br>
+			Width: <input type="number" id="width" step='20' min="100" max="800" value=""/>
+			Height: <input type="number" id="height" step='20' min="100" max="800" value=""/></br>
 			<div id='extra'>
 				Intf: <select id="line"><option  value=""/></option><option  value="SPI"/>SPI</option><option  value="I2C"/>I2C</option><option  value="PCIe"/>PCIe</option><option  value="extBus"/>extBus</option><option  value="DDRbus"/>DDRbus</option><option  value="LCDbus"/>LCDbus</option></select>
-				Length: <select id="length"><option value="100" selected>100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option></select>
+				Length: <input type="number" id="length" step='50' min="50" max="800" value=""/>
 				Orient: <select id="orient"><option value="0">Up</option><option value="1" selected>Right</option><option value="2">Down</option><option value="3">Left</option></select></br>
 			</div>
+			<datalist id="TypeList">
+			  <option value="Internet Explorer">
+			  <option value="Firefox">
+			  <option value="Chrome">
+			  <option value="Opera">
+			  <option value="Safari">
+			</datalist>
+		</div>
+		<div id="dialog-form2" title="Error">
+			
+		</div>
+		<div id="hidden_image">
+			
 		</div>
 	</body>
 	<script src="js/kinetic-v4.4.0.min.js"></script>

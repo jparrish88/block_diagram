@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // onClick's logic below:
     link.addEventListener('click', function() {
         moreboxes(0);
-		//getpdf();
     });
 });
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,6 +37,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('minwindow');
+    // onClick's logic below:
+    link.addEventListener('click', function() {
+		try {
+		  chrome.app.window.minimize();
+		}
+		catch (err) {
+		  // Do something about the exception here
+		  // Show Error on screen
+		  var errorstr="Minimize is not supported yet. See if you can update your browser.<br>";
+		  $( "#dialog-form2" ).html(errorstr).dialog( "open" );
+		}
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('reswindow');
     // onClick's logic below:
     link.addEventListener('click', function() {
@@ -68,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Event listener created to move the whole window
 document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('cssmenu');
     // onClick's logic below:
@@ -92,9 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		function drag(evt){
 		  // Add difference between where the mouse is now
 		  // versus where it was last to the original positions
-		  X2 = winX + evt.clientX-mX;
-		  Y2 = winY + evt.clientY-mY;
-		  window.moveTo(X2,Y2);
+		  window.moveBy((evt.clientX-mX),(evt.clientY-mY));
 		};
 	},false);
 });
@@ -129,12 +142,12 @@ window.onload = function()
 
 $(document).ready(function () {
 	var colors = colorret();
-	$( "#dialog-form > #color" ).html(colors);
-	
-	$( "#dialog-form > #color" ).colourPicker({
+	$( "#dialog-form > #color" ).html(colors).colourPicker({
 	ico:    'images/jquery.colourPicker.gif',
 	title:  false
 	});
+	
+	
 	
 	$( "#dialog-form" ).dialog({
       autoOpen: false,
@@ -162,6 +175,19 @@ $(document).ready(function () {
       },
       close: function() {
         
+      }
+    });
+	$( "#dialog-form2" ).dialog({
+      autoOpen: false,
+      height: 300,
+      width: 350,
+      modal: true,
+      buttons: {
+        "OK": function() {
+			$( this ).dialog( "close" );
+        },
+      },
+      close: function() {
       }
     });
 });
@@ -195,9 +221,9 @@ function loadmodal(info,name)
 	else
 	{
 		// show periph info
-		$( "#dialog-form > #line" ).val(info[8]);
-		$( "#dialog-form > #length" ).val(info[9]);
-		$( "#dialog-form > #orient" ).val(info[10]);
+		$( "#dialog-form > #extra > #line" ).val(info[8]);
+		$( "#dialog-form > #extra > #length" ).val(info[9]);
+		$( "#dialog-form > #extra > #orient" ).val(info[10]);
 		$( "#dialog-form > #extra" ).show();
 	}
 	
@@ -777,11 +803,32 @@ function gwsc()
 	return coloropt;
 }
 
-function getpdf(imgdata)
+function getpdf()
 {
 	var doc = new jsPDF();
-	doc.setFontSize(40);
-	doc.addImage(imgData, 'JPEG', 15, 40, 180, 180);
+	
+	var imagestuff = shapesLayer.toDataURL('image/jpeg',0.7);
+	$('#hidden_image').html('<img src="'+imagestuff+'">');
+	
+	// We'll make our own renderer to skip this editor
+	var specialElementHandlers = {
+		'#editor': function(element, renderer){
+			return true;
+		}
+	};
+
+	// All units are in the set measurement for the document
+	// This can be changed to "pt" (points), "mm" (Default), "cm", "in"
+	doc.fromHTML($('#hidden_image').get(0), 15, 15, {
+		'width': 170, 
+		'elementHandlers': specialElementHandlers
+	});
+	
+	
+	//doc.setFontSize(20);
+	//doc.text(35, 25, "Block Diagram");;
+	//var imagestuff = shapesLayer.toDataURL('image/jpeg',0.7);
+	//doc.addImage(imagestuff, 'JPEG', 15, 40, 180, 180);
 	pdfdata = doc.output('datauristring');
 	window.open(pdfdata);
 
