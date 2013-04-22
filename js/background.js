@@ -9,3 +9,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
     frame: 'none'
   });
 });
+
+chrome.runtime.onSuspend.addListener(function() { 
+  //indexedDB.deleteDatabase('todos');
+});

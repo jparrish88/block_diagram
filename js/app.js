@@ -184,6 +184,29 @@ function writeFileButton()
 };
 */
 document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('save_csv');
+    // onClick's logic below:
+    link.addEventListener('click', function() {
+		$("#blockItems").toCSV();
+        getExcel();
+    });
+});
+
+
+
+function getExcel()
+{
+  var config = {type: 'saveFile', suggestedName: 'blockdiagram.csv'};
+  chrome.fileSystem.chooseEntry(config, function(entry) {
+    var blob = new Blob([exceldata], {type: 'text/plain'});
+    writeFileEntry(entry, blob, function(e) {
+      console.log('Write completed.');
+    });
+  });
+};
+
+
+document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('save_file');
     // onClick's logic below:
     link.addEventListener('click', function() {

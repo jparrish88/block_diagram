@@ -23,7 +23,7 @@
 						   <li><a id="saveimage"><span>PNG</span></a></li>
 						   <li  class="disabled "><a id="savejpg"><span>JPG</span></a></li>
 						</ul>
-						
+						<li><a id="save_csv"><span>As Spreadsheet</span></a></li>
 					  <li  class="disabled " style="display:none"><a id="savepdf"><span>As PDF</span></a></li>
 					  <li  class="disabled " style="display:none"><a id="savepaper"><span>As Paper</span></a></li>
 						
@@ -36,10 +36,12 @@
 					 <li id='moreperiphs'><a><span>Peripheral</span></a></li>
 				  </ul>
 			   </li>
+			   <li class='point '><a id="BOM"><span>BOM</span></a>
 			   
 			</ul>
 		</div>
-		<div id="container"></div>
+		<div id="container">
+		</div>
 		<div id="Drag_Canvas">
 			<a class="floatbutton">Click to Drag Canvas</a>
 		</div>
@@ -72,12 +74,29 @@
 			</datalist>
 		</div>
 		<div id="dialog-form2" title="Error">
-			
+		</div>
+		<div id="dialog-form3" title="DATA">
+			<table id="blockItems" class="ui-widget ui-widget-content">
+				<thead>
+					<tr class="ui-widget-header ">
+						<th>Type</th>
+						<th>SubType</th>
+						<th>Manufacturer</th>
+						<th>Part Number</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+				</tbody>
+			</table>
 		</div>
 		<div id="hidden_image">
 			
 		</div>
 	</body>
+	
+	
+	
 	<script src="js/kinetic-v4.4.0.min.js"></script>
 	<script src="js/jquery-1.9.1.js"></script>
 	<script src="js/jquery.colourPicker.js" type="text/javascript"></script>

@@ -13,6 +13,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('BOM');
+    // onClick's logic below:
+    link.addEventListener('click', function() {
+        $( "#dialog-form3" ).dialog( "open" );
+    });
+});
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    var link = document.getElementById('block');
+    // onClick's logic below:
+    link.addEventListener('dblclick', function() {
+		addblock();
+    });
+});
+*/
+document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('Drag_Canvas');
     // onClick's logic below:
     link.addEventListener('click', function() {
@@ -23,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var link = document.getElementById('closewindow');
     // onClick's logic below:
     link.addEventListener('click', function() {
+		indexedDB.deleteDatabase('blocks');
         window.close();
     });
 });
@@ -122,6 +139,7 @@ var jsonrect;
 var stage;
 var divClone;
 var pdfdata;
+var exceldata;
 
 window.onload = function() 
 {		
@@ -136,6 +154,12 @@ window.onload = function()
 	
 	shapesLayer = new Kinetic.Layer();
 	stage.add(shapesLayer);
+	
+	//var newValue='I love storage';
+    //chrome.storage.local.set({"myValue": newValue}, function() {
+    //  console.log("setting myValue to "+newValue);
+    //});
+	//chrome.storage.sync();
 };
 
 
@@ -190,12 +214,33 @@ $(document).ready(function () {
       close: function() {
       }
     });
+	$( "#dialog-form3" ).dialog({
+      autoOpen: false,
+      height: 400,
+      width: 600,
+      modal: true,
+      buttons: {
+		"Get Spreadsheet": function() {
+			$( this ).dialog( "close" );
+			$("#blockItems").toCSV();
+			getExcel();
+        },
+        "OK": function() {
+			$( this ).dialog( "close" );
+        },
+      },
+      close: function() {
+      }
+    });
+	
+	
 });
 
 function beforemodalopen(name)
 {
 	var info = getblockattr(name);
 	loadmodal(info,name);
+	//websql.indexedDB.addblock(info);
 	$( "#dialog-form" ).dialog( "open" );
 };
 
@@ -294,7 +339,7 @@ function getblockattr(box)
 		var word1=m[1];
 		if (word1=='block')
 		{
-			var info = new Array(word1, typetext, subtypetext, manutext, parttext, widthint, heightint, color);
+			var info = new Array(name, typetext, subtypetext, manutext, parttext, widthint, heightint, color);
 		}
 		else
 		{
@@ -330,7 +375,7 @@ function getblockattr(box)
 					var length = orient.attrs.points[1].x - orient.attrs.points[0].x;
 				}
 			}
-			var info = new Array(word1, typetext, subtypetext, manutext, parttext, widthint, heightint, color, linetext, length, orientval);
+			var info = new Array(name, typetext, subtypetext, manutext, parttext, widthint, heightint, color, linetext, length, orientval);
 		}
 	}
 	return info;
@@ -420,7 +465,8 @@ function highlightbox()
 
 function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 {  
-
+	var info = new Array(name, str0, str1, str2, str3);
+	websql.indexedDB.addblock(info);
 	var rcolor = new RColor;
 	var color = rcolor.get(true, 0.3, 0.99);
 	
@@ -586,6 +632,8 @@ function boxmake(name,str0,str1,str2,str3,str4,x,y,width,height,lined)
 
 function update(box,str0,str1,str2,str3,str4,length,dir,color,width,height,lined)
 {
+	var info = new Array(box.substring(1), str0, str1, str2, str3);
+	websql.indexedDB.addblock(info);
 	var width = parseInt(width);
 	var height = parseInt(height);
 	var shape = shapesLayer.get(box)[0];
@@ -873,4 +921,162 @@ function getAsJPEGBlob(canvas) {
 		return blob;
 		//return data;
 	}
+}
+
+
+	
+var websql = {};
+window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
+
+if ('webkitIndexedDB' in window) {
+  window.IDBTransaction = window.webkitIDBTransaction;
+  window.IDBKeyRange = window.webkitIDBKeyRange;
+}
+
+websql.indexedDB = {};
+websql.indexedDB.db = null;
+
+websql.indexedDB.onerror = function(e) {
+  console.log(e);
+};
+
+websql.indexedDB.open = function() {
+	var version = 2;
+	var request = indexedDB.open("blocks", version);
+
+	// We can only create Object stores in a versionchange transaction.
+	request.onupgradeneeded = function(e) {
+	var db = e.target.result;
+
+	// A versionchange transaction is started automatically.
+	e.target.transaction.onerror = websql.indexedDB.onerror;
+
+	if(db.objectStoreNames.contains("block")) {
+	  db.deleteObjectStore("block");
+	}
+
+	var store = db.createObjectStore("block",
+	  {keyPath: "name"});
+	};
+
+	request.onsuccess = function(e) {
+	websql.indexedDB.db = e.target.result;
+	websql.indexedDB.getAllblockItems();
+	};
+
+	request.onerror = websql.indexedDB.onerror;
+};
+
+websql.indexedDB.addblock = function(info) {
+	var db = websql.indexedDB.db;
+	var trans = db.transaction(["block"], "readwrite");
+	var store = trans.objectStore("block");
+
+	var data = {
+		"name": info[0],
+		"type": info[1],
+		"subtype": info[2],
+		"manu": info[3],
+		"part": info[4],
+		"timeStamp": new Date().getTime()
+	};
+
+	var request = store.put(data);
+
+	request.onsuccess = function(e) {
+		websql.indexedDB.getAllblockItems();
+	};
+
+	request.onerror = function(e) {
+		console.log("Error Adding: ", e);
+	};
+};
+
+websql.indexedDB.deleteblock = function(id) {
+	var db = websql.indexedDB.db;
+	var trans = db.transaction(["block"], "readwrite");
+	var store = trans.objectStore("block");
+
+	var request = store.delete(id);
+
+	request.onsuccess = function(e) {
+		websql.indexedDB.getAllblockItems();
+	};
+
+	request.onerror = function(e) {
+		console.log("Error Adding: ", e);
+	};
+};
+
+websql.indexedDB.getAllblockItems = function() {
+	$('#blockItems > tbody').html('');
+
+	var db = websql.indexedDB.db;
+	var trans = db.transaction(["block"], "readwrite");
+	var store = trans.objectStore("block");
+
+	// Get everything in the store;
+	var cursorRequest = store.openCursor();
+
+	cursorRequest.onsuccess = function(e) {
+		var result = e.target.result;
+		if(!!result == false)
+			return;
+
+		renderblock(result.value);
+		result.continue();
+	};
+
+	cursorRequest.onerror = websql.indexedDB.onerror;
+};
+
+function renderblock(row) 
+{
+	var htmlstr = '';
+	htmlstr += "<tr>";
+	//htmlstr += "<td>" + row.name + "</td>";
+	htmlstr += "<td>" + row.type + "</td>";
+	htmlstr += "<td>" + row.subtype + "</td>";
+	htmlstr += "<td>" + row.manu + "</td>";
+	htmlstr += "<td>" + row.part + "</td>";
+	htmlstr += "</tr>";
+	
+	$('#blockItems > tbody').append(htmlstr);
+}
+
+function init() {
+	websql.indexedDB.open();
+}
+
+window.addEventListener("DOMContentLoaded", init, false);
+
+
+jQuery.fn.toCSV = function() {
+  var data = $(this).first(); //Only one table
+  var csvData = [];
+  var tmpArr = [];
+  var tmpStr = '';
+  data.find("tr").each(function() {
+      if($(this).find("th").length) {
+          $(this).find("th").each(function() {
+            tmpStr = $(this).text().replace(/"/g, '""');
+            tmpArr.push('"' + tmpStr + '"');
+          });
+          csvData.push(tmpArr);
+      } else {
+          tmpArr = [];
+             $(this).find("td").each(function() {
+                  if($(this).text().match(/^-{0,1}\d*\.{0,1}\d+$/)) {
+                      tmpArr.push(parseFloat($(this).text()));
+                  } else {
+                      tmpStr = $(this).text().replace(/"/g, '""');
+                      tmpArr.push('"' + tmpStr + '"');
+                  }
+             });
+          csvData.push(tmpArr.join(','));
+      }
+  });
+  var output = csvData.join('\n');
+  //var uri = 'data:application/csv;charset=UTF-8,' + encodeURIComponent(output);
+  exceldata = output;
 }
