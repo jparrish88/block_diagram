@@ -258,7 +258,7 @@ function loadmodal(info,name)
 	
 
 	// Based on type of block 
-	if (info[0]=='block')
+	if (info[0].substring(0,5)=='block')
 	{
 		//hide extra info only pertinent to periphs
 		$( "#dialog-form > #extra" ).hide();
